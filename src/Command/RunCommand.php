@@ -60,6 +60,7 @@ class RunCommand extends Command {
 			'short' => 'p',
 			'help' => 'Priority',
 			'default' => null,
+			'required' => true
 		]);
 
 		$parser->setDescription(
