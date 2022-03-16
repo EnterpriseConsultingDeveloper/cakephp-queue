@@ -8,6 +8,7 @@ use Cake\Core\Plugin;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\NotImplementedException;
 use Cake\I18n\FrozenTime;
+use Cake\Log\Log;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -458,6 +459,8 @@ class QueuedJobsTable extends Table {
 		$now = $this->getDateTime();
 		$nowStr = $now->toDateTimeString();
 		$driverName = $this->getDriverName();
+
+		Log::info('-> Priority '.$priority);
 
 		$query = $this->find();
 		$age = $query->newExpr()->add('IFNULL(TIMESTAMPDIFF(SECOND, "' . $nowStr . '", notbefore), 0)');
