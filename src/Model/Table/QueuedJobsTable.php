@@ -486,6 +486,7 @@ class QueuedJobsTable extends Table {
 			],
 			'fields' => [
 				'age' => $age,
+				'priority' => $priority
 			],
 			'order' => [
 				'priority' => 'ASC',
