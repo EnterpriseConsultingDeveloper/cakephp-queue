@@ -454,7 +454,7 @@ class QueuedJobsTable extends Table {
 	 * @param int $priority Request a job from priority.
 	 * @return \Queue\Model\Entity\QueuedJob|null
 	 */
-	public function requestJob(array $tasks, array $groups = [], array $types = [], int $priority) {
+	public function requestJob(array $tasks, array $groups = [], array $types = [], int $priority = 5) {
 		$now = $this->getDateTime();
 		$nowStr = $now->toDateTimeString();
 		$driverName = $this->getDriverName();
