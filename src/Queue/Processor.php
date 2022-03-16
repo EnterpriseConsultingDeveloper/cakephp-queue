@@ -433,7 +433,14 @@ class Processor {
 			$config['types'] = $this->stringToArray($args['type']);
 		}
 		if (!empty($args['priority'])) {
-			$config['priority'] = (int)$args['priority'];
+			$config['priority'] = match ($args['priority']) {
+				"1" => 1,
+				"2" => 2,
+				"3" => 3,
+				"4" => 4,
+				"5" => 5,
+				default => 5,
+			};
 		}
 
 		return $config;
