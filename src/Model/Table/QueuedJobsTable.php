@@ -483,10 +483,10 @@ class QueuedJobsTable extends Table {
 			'conditions' => [
 				'completed IS' => null,
 				'OR' => [],
+				'priority' => $priority
 			],
 			'fields' => [
 				'age' => $age,
-				'priority' => $priority
 			],
 			'order' => [
 				'priority' => 'ASC',
