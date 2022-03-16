@@ -420,7 +420,7 @@ class Processor {
 		$config = [
 			'groups' => [],
 			'types' => [],
-			'priority' => 5,
+			'priority' => null,
 			'verbose' => false,
 		];
 		if (!empty($args['verbose'])) {
@@ -433,7 +433,7 @@ class Processor {
 			$config['types'] = $this->stringToArray($args['type']);
 		}
 		if (!empty($args['priority'])) {
-			$config['priority'] = $args['priority'];
+			$config['priority'] = (int)$args['priority'];
 		}
 
 		return $config;
