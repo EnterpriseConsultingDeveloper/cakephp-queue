@@ -59,7 +59,8 @@ class RunCommand extends Command {
 		$parser->addOption('priority', [
 			'short' => 'p',
 			'help' => 'Priority',
-			'default' => 5
+			'default' => null,
+			'required' => true
 		]);
 
 		$parser->setDescription(
