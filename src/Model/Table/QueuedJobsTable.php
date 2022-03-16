@@ -451,9 +451,10 @@ class QueuedJobsTable extends Table {
 	 * @param array<string, array<string, mixed>> $tasks Available QueueWorkerTasks.
 	 * @param array<string> $groups Request a job from these groups (or exclude certain groups), or any otherwise.
 	 * @param array<string> $types Request a job from these types (or exclude certain types), or any otherwise.
+	 * @param int $priority Request a job from priority.
 	 * @return \Queue\Model\Entity\QueuedJob|null
 	 */
-	public function requestJob(array $tasks, array $groups = [], array $types = []) {
+	public function requestJob(array $tasks, array $groups = [], array $types = [], int $priority) {
 		$now = $this->getDateTime();
 		$nowStr = $now->toDateTimeString();
 		$driverName = $this->getDriverName();

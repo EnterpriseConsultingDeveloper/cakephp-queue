@@ -56,6 +56,11 @@ class RunCommand extends Command {
 			'help' => 'Type (comma separated list possible)',
 			'default' => null,
 		]);
+		$parser->addOption('priority', [
+			'short' => 'p',
+			'help' => 'Priority',
+			'default' => null,
+		]);
 
 		$parser->setDescription(
 			'Simple and minimalistic job queue (or deferred-task) system.'

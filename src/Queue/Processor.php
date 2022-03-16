@@ -136,7 +136,7 @@ class Processor {
 			}
 			$this->io->out('[' . date('Y-m-d H:i:s') . '] Looking for Job ...');
 
-			$queuedJob = $this->QueuedJobs->requestJob($this->getTaskConf(), $config['groups'], $config['types']);
+			$queuedJob = $this->QueuedJobs->requestJob($this->getTaskConf(), $config['groups'], $config['types'], $config['priority']);
 
 			if ($queuedJob) {
 				$this->runJob($queuedJob, $pid);
@@ -420,6 +420,7 @@ class Processor {
 		$config = [
 			'groups' => [],
 			'types' => [],
+			'priority' => 5,
 			'verbose' => false,
 		];
 		if (!empty($args['verbose'])) {
@@ -430,6 +431,9 @@ class Processor {
 		}
 		if (!empty($args['type'])) {
 			$config['types'] = $this->stringToArray($args['type']);
+		}
+		if (!empty($args['priority'])) {
+			$config['priority'] = $args['priority'];
 		}
 
 		return $config;
