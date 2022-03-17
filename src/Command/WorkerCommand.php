@@ -76,7 +76,7 @@ class WorkerCommand extends Command {
 
 			foreach ($processes as $worker) {
 				$io->out('- [' . $worker->pid . '] [Priority ' . $worker->priority. '] ' . $worker->server . ':' . $worker->workerkey . ' (' . ($worker->terminate ? 'scheduled to terminate' : 'running') . ')');
-				$io->out('  Last run: ' . $worker->modified);
+				$io->out('  Last run: ' . $worker->modified->format('Y-m-d H:i:s'));
 			}
 
 			return static::CODE_ERROR;
