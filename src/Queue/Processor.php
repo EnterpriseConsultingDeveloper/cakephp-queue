@@ -80,7 +80,7 @@ class Processor {
 		$config = $this->getConfig($args);
 
 		try {
-			$pid = $this->initPid();
+			$pid = $this->initPid($config);
 		} catch (PersistenceFailedException $exception) {
 			$this->io->err($exception->getMessage());
 			$limit = (int)Configure::read('Queue.maxworkers');
@@ -295,15 +295,15 @@ class Processor {
 	}
 
 	/**
+	 * @param $config
 	 * @return string
 	 */
-	protected function initPid(): string {
+	protected function initPid(array $config = []): string {
 		$pid = $this->retrievePid();
 		$key = $this->QueuedJobs->key();
-		$this->QueueProcesses->add($pid, $key);
+		$this->QueueProcesses->add($pid, $key, $config);
 
 		$this->pid = $pid;
-
 		return $pid;
 	}
 

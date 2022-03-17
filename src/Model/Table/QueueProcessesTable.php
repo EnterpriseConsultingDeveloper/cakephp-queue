@@ -134,14 +134,16 @@ class QueueProcessesTable extends Table {
 	/**
 	 * @param string $pid
 	 * @param string $key
+	 * @param array $config
 	 *
 	 * @return int
 	 */
-	public function add(string $pid, string $key): int {
+	public function add(string $pid, string $key, array $config): int {
 		$data = [
 			'pid' => $pid,
 			'server' => $this->buildServerString(),
 			'workerkey' => $key,
+			'priority' => $config['priority'] ?? 0
 		];
 
 		$queueProcess = $this->newEntity($data);
