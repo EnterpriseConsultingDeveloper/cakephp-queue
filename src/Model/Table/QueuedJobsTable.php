@@ -460,7 +460,7 @@ class QueuedJobsTable extends Table {
 		$nowStr = $now->toDateTimeString();
 		$driverName = $this->getDriverName();
 
-		Log::info('-> Priority '.$priority);
+		$this->io->out(' Priority '.$priority);
 
 		$query = $this->find();
 		$age = $query->newExpr()->add('IFNULL(TIMESTAMPDIFF(SECOND, "' . $nowStr . '", notbefore), 0)');
