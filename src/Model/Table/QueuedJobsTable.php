@@ -33,10 +33,10 @@ use RuntimeException;
  * @mixin \Search\Model\Behavior\SearchBehavior
  * @property \Queue\Model\Table\QueueProcessesTable&\Cake\ORM\Association\BelongsTo $WorkerProcesses
  * @method \Queue\Model\Entity\QueuedJob newEmptyEntity()
- * @method \Queue\Model\Entity\QueuedJob[]|\Cake\Datasource\ResultSetInterface|false saveMany(iterable $entities, $options = [])
- * @method \Queue\Model\Entity\QueuedJob[]|\Cake\Datasource\ResultSetInterface saveManyOrFail(iterable $entities, $options = [])
- * @method \Queue\Model\Entity\QueuedJob[]|\Cake\Datasource\ResultSetInterface|false deleteMany(iterable $entities, $options = [])
- * @method \Queue\Model\Entity\QueuedJob[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
+ * @method \Cake\Datasource\ResultSetInterface<\Queue\Model\Entity\QueuedJob>|false saveMany(iterable $entities, $options = [])
+ * @method \Cake\Datasource\ResultSetInterface<\Queue\Model\Entity\QueuedJob> saveManyOrFail(iterable $entities, $options = [])
+ * @method \Cake\Datasource\ResultSetInterface<\Queue\Model\Entity\QueuedJob>|false deleteMany(iterable $entities, $options = [])
+ * @method \Cake\Datasource\ResultSetInterface<\Queue\Model\Entity\QueuedJob> deleteManyOrFail(iterable $entities, $options = [])
  */
 class QueuedJobsTable extends Table {
 
@@ -588,7 +588,7 @@ class QueuedJobsTable extends Table {
 
 						break;
 					case static::DRIVER_SQLSERVER:
-						$tmp["DATEDIFF(s, '1970-01-01 00:00:00', GETDATE()) >="] = $this->rateHistory[$tmp['job_task']] + $task['rate'];
+						$tmp["(DATEDIFF(s, '1970-01-01 00:00:00', GETDATE())) >="] = $this->rateHistory[$tmp['job_task']] + $task['rate'];
 
 						break;
 					case static::DRIVER_SQLITE:
