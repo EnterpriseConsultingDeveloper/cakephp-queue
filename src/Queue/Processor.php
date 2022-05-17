@@ -102,7 +102,8 @@ class Processor {
 			],$config['priority']
 
 			 */
-			$limit = (int)Configure::read('Queue.maxworkerbypriority')[$config['priority']];
+			$limit = Configure::read('Queue.maxworkerbypriority')[$config['priority']];
+			$limit = (int)$limit;
 			if ($limit) {
 				$this->io->out('Cannot start worker: Too many workers already/still running on this server (' . $limit . '/' . $limit . ')');
 			}
