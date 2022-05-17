@@ -134,11 +134,6 @@ class QueueProcessesTable extends Table {
 		$priority = $context['data']['priority'];
 		$maxWorkers = Config::maxworkerspriority();
 		$maxWorkersPriority = $maxWorkers[$priority]['maxworkers'];
-		Log::info('value '.$value);
-		Log::info('priority '.$priority);
-		if (!$value || !$maxWorkersPriority) {
-			return true;
-		}
 
 		$currentWorkers = $this->find()->where(['server' => $value, 'priority' => $priority])->count();
 		if ($currentWorkers >= $maxWorkersPriority) {
