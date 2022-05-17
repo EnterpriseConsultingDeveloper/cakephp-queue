@@ -91,7 +91,18 @@ class Processor {
 			$pid = $this->initPid($config);
 		} catch (PersistenceFailedException $exception) {
 			$this->io->err($exception->getMessage());
-			$limit = (int)Configure::read('Queue.maxworkers');
+			/**
+			 *
+			'maxworkerbypriority' => [ // maxpriority => info array
+			1 => ['maxworkers' => 1],
+			2 => ['maxworkers' => 1],
+			3 => ['maxworkers' => 1],
+			4 => ['maxworkers' => 1],
+			5 => ['maxworkers' => 1],
+			],$config['priority']
+
+			 */
+			$limit = (int)Configure::read('Queue.maxworkerbypriority')[$config['priority']];
 			if ($limit) {
 				$this->io->out('Cannot start worker: Too many workers already/still running on this server (' . $limit . '/' . $limit . ')');
 			}
