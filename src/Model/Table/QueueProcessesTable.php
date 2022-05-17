@@ -4,6 +4,7 @@ namespace Queue\Model\Table;
 
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
+use Cake\Log\Log;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
@@ -112,6 +113,8 @@ class QueueProcessesTable extends Table {
 		if (!$value || !$maxWorkers) {
 			return true;
 		}
+
+		Log::info(print_r($context, true));
 
 		$currentWorkers = $this->find()->where(['server' => $value])->count();
 		if ($currentWorkers >= $maxWorkers) {
