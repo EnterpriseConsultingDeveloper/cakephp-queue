@@ -93,10 +93,10 @@ class QueueProcessesTable extends Table {
 			->notEmptyString('workerkey');
 
 		$validator
-			->add('server', 'validateCount', [
-				'rule' => 'validateCount',
+			->add('server', 'validatePriorityCount', [
+				'rule' => 'validatePriorityCount',
 				'provider' => 'table',
-				'message' => 'Too many workers running. Check your `Queue.maxworkers` config.',
+				'message' => 'Too many workers running. Check your `Queue.maxworkerbypriority` config.',
 			]);
 
 		return $validator;
@@ -118,6 +118,30 @@ class QueueProcessesTable extends Table {
 
 		$currentWorkers = $this->find()->where(['server' => $value])->count();
 		if ($currentWorkers >= $maxWorkers) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param string $value
+	 * @param array<string, mixed> $context
+	 *
+	 * @return bool
+	 */
+	public function validatePriorityCount($value, array $context): bool {
+		$priority = $context['data']['priority'];
+		$maxWorkers = Config::maxworkerspriority();
+		$maxWorkersPriority = $maxWorkers[$priority]['maxworkers'];
+		if (!$value || !$maxWorkersPriority) {
+			return true;
+		}
+
+		Log::info(print_r($context, true));
+
+		$currentWorkers = $this->find()->where(['server' => $value, 'priority' => $priority])->count();
+		if ($currentWorkers >= $maxWorkersPriority) {
 			return false;
 		}
 

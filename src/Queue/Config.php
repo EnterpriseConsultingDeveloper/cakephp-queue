@@ -65,6 +65,13 @@ class Config {
 	}
 
 	/**
+	 * @return int
+	 */
+	public static function maxworkerspriority() {
+		return Configure::read('Queue.maxworkerbypriority', 1);
+	}
+
+	/**
 	 * @return array<string>
 	 */
 	public static function ignoredTasks(): array {
