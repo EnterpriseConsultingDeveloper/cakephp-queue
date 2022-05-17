@@ -114,8 +114,6 @@ class QueueProcessesTable extends Table {
 			return true;
 		}
 
-		Log::info(print_r($context, true));
-
 		$currentWorkers = $this->find()->where(['server' => $value])->count();
 		if ($currentWorkers >= $maxWorkers) {
 			return false;
