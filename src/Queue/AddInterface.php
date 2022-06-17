@@ -19,6 +19,6 @@ interface AddInterface {
 	 *
 	 * @return void
 	 */
-	public function add(?string $data): void;
+	public function add(?array $data): void;
 
 }
