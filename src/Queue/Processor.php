@@ -8,6 +8,7 @@ use Cake\Core\ContainerInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\ORM\Exception\PersistenceFailedException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Text;
 use Psr\Log\LoggerInterface;
 use Queue\Console\Io;
@@ -27,7 +28,12 @@ declare(ticks = 1);
  */
 class Processor {
 
+	/*
+	 * @deprecated Use LocatorAwareTrait instead. Will be removed with next major.
+	 */
 	use ModelAwareTrait;
+
+	use LocatorAwareTrait;
 
 	/**
 	 * @var \Queue\Console\Io
@@ -74,9 +80,9 @@ class Processor {
 		$this->logger = $logger;
 		$this->container = $container;
 
-		$this->modelClass = 'Queue.QueuedJobs';
-		$this->loadModel();
-		$this->loadModel('Queue.QueueProcesses');
+		$tableLocator = $this->getTableLocator();
+		$this->QueuedJobs = $tableLocator->get('Queue.QueuedJobs');
+		$this->QueueProcesses = $tableLocator->get('Queue.QueueProcesses');
 	}
 
 	/**
