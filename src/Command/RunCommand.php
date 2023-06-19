@@ -112,7 +112,7 @@ class RunCommand extends Command {
 	public function execute(Arguments $args, ConsoleIo $io): int {
 
 		if (class_exists('App\Lib\Maintenance')) {
-			if (Maintenance::isActive()) {
+			if (\App\Lib\Maintenance::isActive()) {
 				$io->warning('Maintenance Active');
 				$io->error('Exit.');
 				return CommandInterface::CODE_SUCCESS;
