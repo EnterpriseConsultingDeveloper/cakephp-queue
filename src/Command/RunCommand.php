@@ -4,6 +4,7 @@ namespace Queue\Command;
 
 use Cake\Command\Command;
 use Cake\Console\Arguments;
+use Cake\Console\CommandInterface;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\ContainerInterface;
@@ -109,6 +110,15 @@ class RunCommand extends Command {
 	 * @return int
 	 */
 	public function execute(Arguments $args, ConsoleIo $io): int {
+
+		if (class_exists('App\Lib\Maintenance')) {
+			if (Maintenance::isActive()) {
+				$io->warning('Maintenance Active');
+				$io->error('Exit.');
+				return CommandInterface::CODE_SUCCESS;
+			}
+		}
+
 		$logger = $this->getLogger($args);
 		$io = new Io($io);
 		$processor = new Processor($io, $logger, $this->container);
