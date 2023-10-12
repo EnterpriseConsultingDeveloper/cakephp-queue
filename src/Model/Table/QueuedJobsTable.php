@@ -690,12 +690,16 @@ class QueuedJobsTable extends Table {
 	 * @param string|null $failureMessage Optional message to append to the failure_message field.
 	 * @return bool Success
 	 */
-	public function markJobFailed(QueuedJob $job, ?string $failureMessage = null): bool {
+	public function markJobFailed(QueuedJzob $job, ?string $failureMessage = null): bool {
 		$fields = [
 			'failed' => $job->failed + 1,
 			'failure_message' => $failureMessage,
 		];
 		$job = $this->patchEntity($job, $fields);
+
+		$error = new \App\MACheAccade\MACheAccade();
+		$error->setMessage("Job: ".$job->job_task." Customer: ".$job->job_group." ID: ".$job->id, $failureMessage);
+		$error->send();
 
 		return (bool)$this->save($job);
 	}
