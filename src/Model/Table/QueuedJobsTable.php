@@ -697,11 +697,9 @@ class QueuedJobsTable extends Table {
 		];
 		$job = $this->patchEntity($job, $fields);
 
-		if (class_exists('\App\MACheAccade\MACheAccade')) {
-			$error = new \App\MACheAccade\MACheAccade();
-			$error->setMessage("Job: " . $job->job_task . " - Customer: " . $job->job_group . " - ID: " . $job->id, $failureMessage);
-			$error->send();
-		}
+		$error = new \App\MACheAccade\MACheAccade();
+		$error->setMessage("Job: " . $job->job_task . " - Customer: " . $job->job_group . " - ID: " . $job->id, $failureMessage);
+		$error->send();
 
 		return (bool)$this->save($job);
 	}
