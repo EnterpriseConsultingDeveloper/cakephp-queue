@@ -20,10 +20,6 @@
 			"name": "Contributors",
 			"homepage": "https://github.com/dereuromark/cakephp-queue/graphs/contributors",
 			"role": "Contributor"
-		},
-		{
-			"name": "Contributors",
-			"role": "Contributor"
 		}
 	],
 	"require": {
