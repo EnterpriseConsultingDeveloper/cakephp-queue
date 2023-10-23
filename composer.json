@@ -43,7 +43,7 @@
 		"dereuromark/cakephp-ide-helper": "For maximum IDE support, especially around createJob() usage."
 	},
 	"support": {
-		"source": "https://github.com/EnterpriseConsultingDeveloper/cakephp-queue"
+		"source": "https://github.com/dereuromark/cakephp-queue"
 	},
 	"autoload": {
 		"psr-4": {
@@ -59,6 +59,7 @@
 		}
 	},
 	"prefer-stable": true,
+	"minimum-stability": "stable",
 	"scripts": {
 		"stan": "phpstan analyse",
 		"stan-tests": "phpstan analyse -c tests/phpstan.neon",
