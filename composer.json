@@ -58,7 +58,7 @@
 			"Foo\\": "tests/test_app/plugins/Foo/src/"
 		}
 	},
-	"prefer-stable": false,
+	"prefer-stable": true,
 	"scripts": {
 		"stan": "phpstan analyse",
 		"stan-tests": "phpstan analyse -c tests/phpstan.neon",
