@@ -15,6 +15,7 @@ use Queue\Console\Io;
 use Queue\Model\Entity\QueuedJob;
 use Queue\Model\ProcessEndingException;
 use Queue\Model\QueueException;
+use Queue\Utility\Serializer;
 use RuntimeException;
 use Throwable;
 
@@ -22,10 +23,8 @@ declare(ticks = 1);
 
 /**
  * Main shell to init and run queue workers.
- *
- * @property \Queue\Model\Table\QueuedJobsTable $QueuedJobs
- * @property \Queue\Model\Table\QueueProcessesTable $QueueProcesses
  */
+#[\AllowDynamicProperties]
 class Processor {
 
 	/*
@@ -69,6 +68,16 @@ class Processor {
 	 * @var string|null
 	 */
 	protected $pid;
+
+	/**
+	 * @var \Queue\Model\Table\QueuedJobsTable
+	 */
+	protected $QueuedJobs;
+
+	/**
+	 * @var \Queue\Model\Table\QueueProcessesTable
+	 */
+	protected $QueueProcesses;
 
 	/**
 	 * @param \Queue\Console\Io $io
@@ -209,7 +218,7 @@ class Processor {
 		try {
 			$this->time = time();
 
-			$data = $queuedJob->data ? unserialize($queuedJob->data) : null;
+			$data = $queuedJob->data ? Serializer::deserialize($queuedJob->data) : null;
 			$task = $this->loadTask($taskName);
 			$traits = class_uses($task);
 			if ($this->container && $traits && in_array(ServicesTrait::class, $traits, true)) {

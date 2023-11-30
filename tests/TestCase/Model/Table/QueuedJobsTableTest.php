@@ -26,7 +26,7 @@ class QueuedJobsTableTest extends TestCase {
 	protected $QueuedJobs;
 
 	/**
-	 * @var array
+	 * @var array<string>
 	 */
 	protected $fixtures = [
 		'plugin.Queue.QueuedJobs',
@@ -105,13 +105,44 @@ class QueuedJobsTableTest extends TestCase {
 	}
 
 	/**
+	 * @return void
+	 */
+	public function testMarkJobDone() {
+		$job = $this->QueuedJobs->createJob('Foo', [
+			'some' => 'random',
+			'test' => 'data',
+		]);
+		$this->assertTrue($this->QueuedJobs->markJobDone($job));
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testMarkJobFailed() {
+		$job = $this->QueuedJobs->createJob('Foo', [
+			'some' => 'random',
+			'test' => 'data',
+		]);
+		$this->assertTrue($this->QueuedJobs->markJobFailed($job));
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testFlushFailedJobs() {
+		$this->QueuedJobs->createJob('Foo', [
+			'some' => 'random',
+			'test' => 'data',
+		]);
+		$this->assertSame(0, $this->QueuedJobs->flushFailedJobs());
+	}
+
+	/**
 	 * Test the basic create and fetch functions.
 	 *
 	 * @return void
 	 */
 	public function testCreateAndFetch() {
-		$this->_needsConnection();
-
 		//$capabilities is a list of tasks the worker can run.
 		$capabilities = [
 			'Foo' => [
@@ -196,8 +227,6 @@ class QueuedJobsTableTest extends TestCase {
 	 * @return void
 	 */
 	public function testSequence() {
-		$this->_needsConnection();
-
 		//$capabilities is a list of tasks the worker can run.
 		$capabilities = [
 			'Foo' => [
@@ -323,7 +352,8 @@ class QueuedJobsTableTest extends TestCase {
 			$tmp = $this->QueuedJobs->requestJob($capabilities);
 
 			$this->assertSame($item['name'], $tmp['job_task']);
-			$this->assertEquals($item['data'], unserialize($tmp['data']));
+			$dataValue = $tmp['data'] !== null ? unserialize($tmp['data']) : null;
+			$this->assertEquals($item['data'], $dataValue);
 		}
 	}
 
@@ -386,14 +416,14 @@ class QueuedJobsTableTest extends TestCase {
 		$this->QueuedJobs->clearKey();
 		$tmp = $this->QueuedJobs->requestJob($capabilities);
 		$this->assertSame('Queue.Example', $tmp['job_task']);
-		$this->assertFalse(unserialize($tmp['data']));
+		$this->assertNull($tmp['data']);
 
 		usleep(100000);
 		//and again.
 		$this->QueuedJobs->clearKey();
 		$tmp = $this->QueuedJobs->requestJob($capabilities);
 		$this->assertSame('Queue.Example', $tmp['job_task']);
-		$this->assertFalse(unserialize($tmp['data']));
+		$this->assertNull($tmp['data']);
 
 		//Then some time passes
 		sleep(2);
@@ -408,7 +438,7 @@ class QueuedJobsTableTest extends TestCase {
 		$this->QueuedJobs->clearKey();
 		$tmp = $this->QueuedJobs->requestJob($capabilities);
 		$this->assertSame('Queue.Example', $tmp['job_task']);
-		$this->assertFalse(unserialize($tmp['data']));
+		$this->assertNull($tmp['data']);
 
 		//Then some more time passes
 		sleep(2);
@@ -423,7 +453,7 @@ class QueuedJobsTableTest extends TestCase {
 		$this->QueuedJobs->clearKey();
 		$tmp = $this->QueuedJobs->requestJob($capabilities);
 		$this->assertSame('Queue.Example', $tmp['job_task']);
-		$this->assertFalse(unserialize($tmp['data']));
+		$this->assertNull($tmp['data']);
 
 		//and now the queue is empty
 		$this->QueuedJobs->clearKey();
@@ -510,13 +540,9 @@ class QueuedJobsTableTest extends TestCase {
 	}
 
 	/**
-	 * Testing requesting, only works for non-SQlite so far.
-	 *
 	 * @return void
 	 */
 	public function testRequestJob() {
-		$this->_needsConnection();
-
 		$capabilities = [
 			'Foo' => [
 				'name' => 'Foo',
@@ -538,8 +564,6 @@ class QueuedJobsTableTest extends TestCase {
 	 * @return void
 	 */
 	public function testRequestGroup() {
-		$this->_needsConnection();
-
 		$capabilities = [
 			'Foo' => [
 				'name' => 'Foo',
@@ -611,8 +635,6 @@ class QueuedJobsTableTest extends TestCase {
 	 * @return void
 	 */
 	public function testPriority() {
-		$this->_needsConnection();
-
 		$capabilities = [
 			'Foo' => [
 				'name' => 'Foo',
@@ -668,9 +690,9 @@ class QueuedJobsTableTest extends TestCase {
 	public function testGetStats() {
 		$queuedJob = $this->QueuedJobs->newEntity([
 			'job_task' => 'Foo',
-			'completed' => (new FrozenTime())->subHour(2),
-			'fetched' => (new FrozenTime())->subHour(3),
-			'created' => (new FrozenTime())->subHour(5),
+			'completed' => (new FrozenTime())->subHours(2),
+			'fetched' => (new FrozenTime())->subHours(3),
+			'created' => (new FrozenTime())->subHours(5),
 		]);
 		$this->QueuedJobs->saveOrFail($queuedJob);
 

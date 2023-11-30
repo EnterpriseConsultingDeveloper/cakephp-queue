@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Queue\Test\TestCase\Command;
 
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use Shim\TestSuite\TestTrait;
 
@@ -12,8 +12,8 @@ use Shim\TestSuite\TestTrait;
  */
 class BakeQueueTaskCommandTest extends TestCase {
 
-	use ConsoleIntegrationTestTrait;
 	use TestTrait;
+	use ConsoleIntegrationTestTrait;
 
 	/**
 	 * @var string
@@ -68,6 +68,25 @@ class BakeQueueTaskCommandTest extends TestCase {
 	/**
 	 * @return void
 	 */
+	public function testExecuteWithSubFolder(): void {
+		$this->exec('bake queue_task Sub/FooBarBaz -a -f');
+
+		$output = $this->_out->output();
+		$this->assertStringContainsString('Creating file', $output);
+		$this->assertStringContainsString('<success>Wrote</success>', $output);
+
+		$file = $this->filePath . 'Sub' . DS . 'FooBarBazTask.php';
+		$expected = TESTS . 'test_files' . DS . 'bake' . DS . 'Sub' . DS . 'task.php';
+		$this->assertFileEquals($expected, $file);
+
+		$file = $this->testFilePath . 'Sub' . DS . 'FooBarBazTaskTest.php';
+		$expected = TESTS . 'test_files' . DS . 'bake' . DS . 'Sub' . DS . 'task_test.php';
+		$this->assertFileEquals($expected, $file);
+	}
+
+	/**
+	 * @return void
+	 */
 	protected function removeFiles(): void {
 		if ($this->isDebug()) {
 			return;
@@ -77,8 +96,16 @@ class BakeQueueTaskCommandTest extends TestCase {
 		if (file_exists($file)) {
 			unlink($file);
 		}
+		$file = $this->filePath . 'Sub' . DS . 'FooBarBazTask.php';
+		if (file_exists($file)) {
+			unlink($file);
+		}
 
 		$testFile = $this->testFilePath . 'FooBarBazTaskTest.php';
+		if (file_exists($testFile)) {
+			unlink($testFile);
+		}
+		$testFile = $this->testFilePath . 'Sub' . DS . 'FooBarBazTaskTest.php';
 		if (file_exists($testFile)) {
 			unlink($testFile);
 		}

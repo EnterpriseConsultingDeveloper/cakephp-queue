@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Queue\Model\Entity\QueuedJob;
 use Queue\Queue\Config;
 use Queue\Queue\TaskFinder;
+use Queue\Utility\Serializer;
 use RuntimeException;
 
 /**
@@ -173,6 +174,11 @@ class QueuedJobsTable extends Table {
 			->requirePresence('job_task', 'create')
 			->notEmptyString('job_task');
 
+		$validator
+			->greaterThanOrEqual('progress', 0)
+			->lessThanOrEqual('progress', 1)
+			->allowEmptyString('progress');
+
 		return $validator;
 	}
 
@@ -193,7 +199,7 @@ class QueuedJobsTable extends Table {
 	public function createJob(string $jobTask, ?array $data = null, array $config = []) {
 		$queuedJob = [
 			'job_task' => $this->jobTask($jobTask),
-			'data' => is_array($data) ? serialize($data) : null,
+			'data' => is_array($data) ? Serializer::serialize($data) : null,
 			'job_group' => !empty($config['group']) ? $config['group'] : null,
 			'notbefore' => !empty($config['notBefore']) ? $this->getDateTime($config['notBefore']) : null,
 		] + $config;
@@ -473,7 +479,8 @@ class QueuedJobsTable extends Table {
 
 				break;
 			case static::DRIVER_SQLITE:
-				//TODO
+				$age = $query->newExpr()
+					->add('IFNULL(CAST(strftime("%s", CURRENT_TIMESTAMP) as integer) - CAST(strftime("%s", "' . $nowStr . '") as integer), 0)');
 
 				break;
 		}
@@ -675,7 +682,7 @@ class QueuedJobsTable extends Table {
 	 */
 	public function markJobDone(QueuedJob $job): bool {
 		$fields = [
-			'progress' => 100,
+			'progress' => 1,
 			'completed' => $this->getDateTime(),
 		];
 		$job = $this->patchEntity($job, $fields);
@@ -910,7 +917,7 @@ class QueuedJobsTable extends Table {
 		if ($this->_key !== null) {
 			return $this->_key;
 		}
-		$this->_key = sha1(microtime());
+		$this->_key = sha1(microtime() . mt_rand(100, 999));
 		if (!$this->_key) {
 			throw new RuntimeException('Invalid key generated');
 		}

@@ -10,10 +10,12 @@ use Cake\Core\Configure;
 use Cake\Error\Debugger;
 use Cake\I18n\FrozenTime;
 use Queue\Model\Entity\QueuedJob;
+use Queue\Utility\Serializer;
 
 /**
  * @property \Queue\Model\Table\QueuedJobsTable $QueuedJobs
  */
+#[\AllowDynamicProperties]
 class JobCommand extends Command {
 
 	/**
@@ -247,7 +249,7 @@ class JobCommand extends Command {
 			$io->out('Failure message: ' . ($queuedJob->failure_message ?: '-'));
 		}
 
-		$data = $queuedJob->data ? unserialize($queuedJob->data) : null;
+		$data = $queuedJob->data ? Serializer::deserialize($queuedJob->data) : null;
 		$io->out('Data: ' . Debugger::exportVar($data, 9));
 
 		return static::CODE_SUCCESS;

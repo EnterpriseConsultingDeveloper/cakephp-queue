@@ -17,7 +17,7 @@ class AlterQueuedJobs extends AbstractMigration {
 	 * @return void
 	 */
 	public function change() {
-		if ($this->adapter instanceof \Phinx\Db\Adapter\MysqlAdapter) {
+		if ($this->adapter instanceof MysqlAdapter) {
 			$table = $this->table('queued_jobs');
 
 			try {
@@ -36,4 +36,5 @@ class AlterQueuedJobs extends AbstractMigration {
 			}
 		}
 	}
+
 }

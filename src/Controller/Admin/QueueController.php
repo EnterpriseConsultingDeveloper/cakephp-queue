@@ -5,12 +5,15 @@ namespace Queue\Controller\Admin;
 use App\Controller\AppController;
 use Cake\Core\App;
 use Cake\Http\Exception\NotFoundException;
+use Queue\Queue\AddFromBackendInterface;
+use Queue\Queue\AddInterface;
 use Queue\Queue\TaskFinder;
 
 /**
  * @property \Queue\Model\Table\QueuedJobsTable $QueuedJobs
  * @property \Queue\Model\Table\QueueProcessesTable $QueueProcesses
  */
+#[\AllowDynamicProperties]
 class QueueController extends AppController {
 
 	use LoadHelperTrait;
@@ -53,9 +56,13 @@ class QueueController extends AppController {
 
 		$taskFinder = new TaskFinder();
 		$tasks = $taskFinder->all();
-		$addableTasks = $taskFinder->allAddable();
+		$addableTasks = $taskFinder->allAddable(AddFromBackendInterface::class);
 
-		$servers = $this->QueueProcesses->find()->distinct(['server'])->find('list', ['keyField' => 'server', 'valueField' => 'server'])->toArray();
+		$servers = $this->QueueProcesses->find()
+			->distinct(['server'])
+			->where(['server IS NOT' => null])
+			->find('list', ['keyField' => 'server', 'valueField' => 'server'])
+			->toArray();
 		$this->set(compact('new', 'current', 'data', 'pendingDetails', 'status', 'tasks', 'addableTasks', 'servers'));
 	}
 
@@ -73,17 +80,18 @@ class QueueController extends AppController {
 			throw new NotFoundException();
 		}
 
+		/** @var class-string<\Queue\Queue\Task> $className */
 		$className = App::className($job, 'Queue/Task', 'Task');
 		if (!$className) {
 			throw new NotFoundException('Class not found for job `' . $job . '`');
 		}
 
-		// Deprecated/Remove?
-		if (method_exists($className, 'init')) {
-			$className::init();
+		$object = new $className();
+		if ($object instanceof AddInterface) {
+			$object->add(null);
+		} else {
+			$this->QueuedJobs->createJob($job);
 		}
-
-		$this->QueuedJobs->createJob($job);
 
 		$this->Flash->success('Job ' . $job . ' added');
 
@@ -159,7 +167,7 @@ class QueueController extends AppController {
 		$this->request->allowMethod('post');
 		$resetted = $this->QueuedJobs->reset(null, (bool)$this->request->getQuery('full'));
 
-		$message = __d('queue', '{n} jobs reset for re-run', $resetted);
+		$message = __d('queue', '{0} jobs reset for re-run', $resetted);
 		$this->Flash->success($message);
 
 		return $this->redirect(['action' => 'index']);
@@ -174,7 +182,7 @@ class QueueController extends AppController {
 		$this->request->allowMethod('post');
 		$count = $this->QueuedJobs->flushFailedJobs();
 
-		$message = __d('queue', '{n} jobs removed', $count);
+		$message = __d('queue', '{0} jobs removed', $count);
 		$this->Flash->success($message);
 
 		return $this->redirect(['action' => 'index']);

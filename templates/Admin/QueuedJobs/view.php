@@ -2,7 +2,12 @@
 /**
  * @var \App\View\AppView $this
  * @var \Queue\Model\Entity\QueuedJob $queuedJob
+ * @var bool $shimActive Deprecated: Will be removed with major
  */
+
+use Brick\VarExporter\VarExporter;
+use Queue\Utility\Serializer;
+
 ?>
 <nav class="actions large-3 medium-4 columns col-sm-4 col-12" id="actions-sidebar">
 	<ul class="side-nav nav nav-pills flex-column">
@@ -120,19 +125,31 @@
 		</tr>
 	</table>
 	<div class="row">
+		<div class="col-md-12">
 		<h3><?= __d('queue', 'Data') ?></h3>
+		<p>
 		<?= $queuedJob->data ? $this->Text->autoParagraph(h($queuedJob->data)) : ''; ?>
+		</p>
 		<?php
-			if ($queuedJob->data && $this->Configure->read('debug')) {
-				$data = unserialize($queuedJob->data);
-				echo '<h4>Unserialized content (debug only)</h4>';
-				echo '<pre>' . h(print_r($data, true)) . '</pre>';
+			if ($queuedJob->data) {
+				$data = Serializer::deserialize($queuedJob->data);
+				echo '<h4>Unserialized content</h4>';
+				echo '<pre>' . h(VarExporter::export($data, VarExporter::TRAILING_COMMA_IN_ARRAY)) . '</pre>';
+
+				if ($shimActive && !$data) {
+					echo '<p>';
+					echo $this->Form->postLink('Transform data to current serializer strategy', null, ['class' => 'btn btn-secondary']);
+					echo '</p>';
+				}
 			}
 		?>
+		</div>
 	</div>
 	<div class="row">
+		<div class="col-md-12">
 		<h3><?= __d('queue', 'Failure Message') ?></h3>
 		<?= $queuedJob->failure_message ? $this->Text->autoParagraph(h($queuedJob->failure_message)) : ''; ?>
+	</div>
 	</div>
 
 </div>

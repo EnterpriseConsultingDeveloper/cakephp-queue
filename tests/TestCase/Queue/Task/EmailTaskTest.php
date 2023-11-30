@@ -3,6 +3,7 @@
 namespace Queue\Test\TestCase\Queue\Task;
 
 use Cake\Console\ConsoleIo;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\Message;
@@ -14,6 +15,7 @@ use Queue\Queue\Task\EmailTask;
 use Shim\TestSuite\ConsoleOutput;
 use Shim\TestSuite\TestTrait;
 use TestApp\Mailer\TestMailer;
+use Tools\Mailer\Message as MailerMessage;
 
 class EmailTaskTest extends TestCase {
 
@@ -59,6 +61,23 @@ class EmailTaskTest extends TestCase {
 	/**
 	 * @return void
 	 */
+	public function testAdd() {
+		Configure::write('Config.adminEmail', 'test@test.de');
+		$this->Task->add(null);
+
+		Configure::delete('Config.adminEmail');
+
+		/** @var \Queue\Model\Table\QueuedJobsTable $queuedJobsTable */
+		$queuedJobsTable = $this->getTableLocator()->get('Queue.QueuedJobs');
+
+		/** @var \Queue\Model\Entity\QueuedJob $queuedJob */
+		$queuedJob = $queuedJobsTable->find()->orderDesc('id')->firstOrFail();
+		$this->assertSame('Queue.Email', $queuedJob->job_task);
+	}
+
+	/**
+	 * @return void
+	 */
 	public function testRunArray() {
 		$settings = [
 			'from' => 'test@test.de',
@@ -92,6 +111,7 @@ class EmailTaskTest extends TestCase {
 					'copy-other@test.de' => 'Your Other Name',
 				],
 			],
+			'helpers' => [['Shim.Configure']],
 		];
 
 		$data = [
@@ -182,6 +202,45 @@ class EmailTaskTest extends TestCase {
 		$data = [
 			'transport' => 'test_mock',
 			'settings' => $message,
+		];
+
+		$this->Task->run($data, 0);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testRunToolsEmailMessageClassString() {
+		$class = MailerMessage::class;
+		$settings = [
+			'from' => 'test@test.de',
+			'test@test.de',
+			'text' => 'Foo Bar',
+		];
+
+		/** @var \Queue\Model\Table\QueuedJobsTable $queuedJobsTable */
+		$queuedJobsTable = $this->getTableLocator()->get('Queue.QueuedJobs');
+		$queuedJobsTable->createJob('Queue.Email', ['class' => $class, 'settings' => $settings]);
+
+		$queuedJob = $queuedJobsTable->find()->orderDesc('id')->firstOrFail();
+		$data = unserialize($queuedJob->data);
+		/** @var \TestApp\Mailer\TestMailer $mailer */
+		$class = $data['class'];
+
+		$transportMock = $this->createMock(
+			DebugTransport::class,
+		);
+		$transportMock
+			->expects($this->once())
+			->method('send')
+			->with($this->equalTo(new $class($settings)))
+			->willReturn(['headers' => [], 'message' => '']);
+		TransportFactory::getRegistry()->set('test_mock', $transportMock);
+
+		$data = [
+			'transport' => 'test_mock',
+			'class' => $class,
+			'settings' => $settings,
 		];
 
 		$this->Task->run($data, 0);
