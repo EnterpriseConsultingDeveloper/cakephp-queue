@@ -12,12 +12,14 @@ use Cake\Log\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Queue\Console\Io;
+use Queue\Model\Table\QueueProcessesTable;
 use Queue\Queue\Processor;
 
 /**
  * Main execution of queued jobs.
  */
 class RunCommand extends Command {
+	public ?QueueProcessesTable $QueueProcesses = null;
 
 	/**
 	 * @var \Cake\Core\ContainerInterface
