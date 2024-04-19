@@ -342,11 +342,11 @@ class QueueProcessesTable extends Table {
 	 *
 	 * @return void
 	 */
-	public function wakeUpWorkersByPriority(string $priority): void {
+	public function wakeUpWorkersByPriority(string $priority, bool $forThisServer = false): void {
 		if (!function_exists('posix_kill')) {
 			return;
 		}
-		$processes = $this->getProcesses(true);
+		$processes = $this->getProcesses($forThisServer);
 		foreach ($processes as $process) {
 			if ($process->priority === $priority) {
 				$pid = (int)$process->pid;
