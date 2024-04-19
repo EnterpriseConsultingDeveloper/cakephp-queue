@@ -331,13 +331,13 @@ class QueueProcessesTable extends Table {
 		foreach ($processes as $process) {
 			$pid = (int)$process->pid;
 			if ($pid > 0) {
-				posix_kill($pid, SIGUSR1);
+				posix_kill($pid, 10 /* SIGUSR1 */);
 			}
 		}
 	}
 
 	/**
-	 * Sends a SIGUSR1 to all workers. This will only affect workers
+	 * Sends a SIGUSR1 to all workers of specified priority. This will only affect workers
 	 * running with config option canInterruptSleep set to true.
 	 *
 	 * @return void
@@ -351,7 +351,7 @@ class QueueProcessesTable extends Table {
 			if ($process->priority === $priority) {
 				$pid = (int)$process->pid;
 				if ($pid > 0) {
-					posix_kill($pid, SIGUSR1);
+					posix_kill($pid, 10 /* SIGUSR1 */);
 				}
 			}
 		}
