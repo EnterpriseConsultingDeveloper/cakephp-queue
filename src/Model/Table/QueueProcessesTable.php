@@ -337,6 +337,27 @@ class QueueProcessesTable extends Table {
 	}
 
 	/**
+	 * Sends a SIGUSR1 to all workers. This will only affect workers
+	 * running with config option canInterruptSleep set to true.
+	 *
+	 * @return void
+	 */
+	public function wakeUpWorkersByPriority(string $priority): void {
+		if (!function_exists('posix_kill')) {
+			return;
+		}
+		$processes = $this->getProcesses(true);
+		foreach ($processes as $process) {
+			if ($process->priority === $priority) {
+				$pid = (int)$process->pid;
+				if ($pid > 0) {
+					posix_kill($pid, SIGUSR1);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Use ENV to control the server name of the servers run workers with.
 	 *
 	 * export SERVER_NAME=myserver1
